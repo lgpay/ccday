@@ -2,129 +2,111 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>信用卡管理系统</title>
+    <title>信用卡管理助手</title>
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/element-plus/dist/index.full.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app">
-        <el-container>
-            <el-header>信用卡管理系统</el-header>
-            
-            <el-main>
-                <el-form :model="cardForm" label-width="120px">
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item label="卡片名称">
-                                <el-input v-model="cardForm.name" placeholder="请输入卡片名称"></el-input>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="发卡银行">
-                                <el-select v-model="cardForm.bank" placeholder="请选择银行">
-                                    <el-option 
-                                        v-for="bank in banks" 
-                                        :key="bank" 
-                                        :label="bank" 
-                                        :value="bank">
-                                    </el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+    <div id="app" class="container">
+        <h1>信用卡管理助手</h1>
+        
+        <!-- 添加信用卡表单 -->
+        <el-form :model="cardForm" label-width="120px">
+            <el-form-item label="持卡人姓名">
+                <el-input v-model="cardForm.name" placeholder="请输入持卡人姓名"></el-input>
+            </el-form-item>
 
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item label="账单日">
-                                <el-input-number 
-                                    v-model="cardForm.billDay" 
-                                    :min="1" 
-                                    :max="31"
-                                    placeholder="请输入账单日">
-                                </el-input-number>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="账单周期">
-                                <el-select v-model="cardForm.billCycle">
-                                    <el-option label="本期账单" value="current"></el-option>
-                                    <el-option label="下期账单" value="next"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+            <el-form-item label="发卡银行">
+                <el-select v-model="cardForm.bank" placeholder="请选择发卡银行">
+                    <el-option 
+                        v-for="bankName in banks" 
+                        :key="bankName" 
+                        :label="bankName" 
+                        :value="bankName">
+                    </el-option>
+                </el-select>
+            </el-form-item>
 
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item label="还款模式">
-                                <el-select v-model="cardForm.billMode" @change="resetAdditionalFields">
-                                    <el-option label="宽限期模式" value="grace"></el-option>
-                                    <el-option label="固定还款日模式" value="fixed"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item 
-                                v-if="cardForm.billMode === 'grace'" 
-                                label="宽限期天数">
-                                <el-input-number 
-                                    v-model="cardForm.gracePeriod" 
-                                    :min="1" 
-                                    :max="30"
-                                    placeholder="请输入宽限期天数">
-                                </el-input-number>
-                            </el-form-item>
-                            <el-form-item 
-                                v-if="cardForm.billMode === 'fixed'" 
-                                label="固定还款日">
-                                <el-input-number 
-                                    v-model="cardForm.fixedRepaymentDay" 
-                                    :min="1" 
-                                    :max="31"
-                                    placeholder="请输入固定还款日">
-                                </el-input-number>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+            <el-form-item label="账单日">
+                <el-input-number 
+                    v-model="cardForm.billDay" 
+                    :min="1" 
+                    :max="31"
+                    placeholder="请输入账单日">
+                </el-input-number>
+            </el-form-item>
 
-                    <el-form-item>
-                        <el-button type="primary" @click="addCard">添加信用卡</el-button>
-                    </el-form-item>
-                </el-form>
+            <el-form-item label="还款模式">
+                <el-select 
+                    v-model="cardForm.billMode" 
+                    @change="resetAdditionalFields"
+                    placeholder="请选择还款模式">
+                    <el-option label="宽限期模式" value="grace"></el-option>
+                    <el-option label="固定还款日模式" value="fixed"></el-option>
+                </el-select>
+            </el-form-item>
 
-                <el-table :data="cards" border stripe>
-                    <el-table-column prop="name" label="卡片名称"></el-table-column>
-                    <el-table-column prop="bank" label="发卡银行"></el-table-column>
-                    <el-table-column prop="billDay" label="账单日"></el-table-column>
-                    <el-table-column prop="billCycle" label="账单周期">
-                        <template #default="scope">
-                            {{ scope.row.billCycle === 'current' ? '本期账单' : '下期账单' }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="billMode" label="还款模式">
-                        <template #default="scope">
-                            {{ scope.row.billMode === 'grace' ? '宽限期模式' : '固定还款日模式' }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="repaymentDate" label="还款日期"></el-table-column>
-                    <el-table-column prop="interestFreeDays" label="免息天数"></el-table-column>
-                    <el-table-column label="操作">
-                        <template #default="scope">
-                            <el-button 
-                                type="danger" 
-                                size="small" 
-                                @click="deleteCard(scope.$index)">
-                                删除
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-main>
-        </el-container>
+            <el-form-item v-if="cardForm.billMode === 'grace'" label="宽限期天数">
+                <el-input-number 
+                    v-model="cardForm.gracePeriod" 
+                    :min="0" 
+                    :max="30"
+                    placeholder="请输入宽限期天数">
+                </el-input-number>
+            </el-form-item>
+
+            <el-form-item v-if="cardForm.billMode === 'fixed'" label="固定还款日">
+                <el-input-number 
+                    v-model="cardForm.fixedRepaymentDay" 
+                    :min="1" 
+                    :max="28"
+                    placeholder="请输入固定还款日">
+                </el-input-number>
+            </el-form-item>
+
+            <el-form-item label="账单日消费是否算本期">
+                <el-select v-model="cardForm.billCycle">
+                    <el-option label="是" value="current"></el-option>
+                    <el-option label="否" value="next"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="addCard">添加信用卡</el-button>
+            </el-form-item>
+        </el-form>
+
+        <!-- 信用卡列表 -->
+        <el-table :data="cards" border stripe>
+            <el-table-column prop="name" label="持卡人"></el-table-column>
+            <el-table-column prop="bank" label="发卡银行"></el-table-column>
+            <el-table-column prop="billDay" label="账单日"></el-table-column>
+            <el-table-column label="还款模式">
+                <template #default="scope">
+                    {{ scope.row.billMode === 'grace' ? '宽限期模式' : '固定还款日模式' }}
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button 
+                        type="primary" 
+                        size="small" 
+                        @click="editCard(scope.row)">
+                        编辑
+                    </el-button>
+                    <el-button 
+                        type="danger" 
+                        size="small" 
+                        @click="deleteCard(scope.row)">
+                        删除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
     </div>
 
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
     <script src="app.js"></script>
 </body>
 </html>

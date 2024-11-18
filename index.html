@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>信用卡管理</title>
+    <title>信用卡管理系统</title>
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/element-plus"></script>
@@ -16,11 +16,11 @@
                 <!-- 添加信用卡表单 -->
                 <el-form :model="cardForm" label-width="120px">
                     <el-form-item label="卡片名称">
-                        <el-input v-model="cardForm.name"></el-input>
+                        <el-input v-model="cardForm.name" placeholder="请输入卡片名称"></el-input>
                     </el-form-item>
                     
-                    <el-form-item label="银行">
-                        <el-select v-model="cardForm.bank">
+                    <el-form-item label="发卡银行">
+                        <el-select v-model="cardForm.bank" placeholder="请选择银行">
                             <el-option 
                                 v-for="bank in banks" 
                                 :key="bank" 
@@ -34,7 +34,37 @@
                         <el-input-number 
                             v-model="cardForm.billDay" 
                             :min="1" 
-                            :max="31">
+                            :max="31"
+                            placeholder="输入账单日">
+                        </el-input-number>
+                    </el-form-item>
+
+                    <el-form-item label="账单模式">
+                        <el-select v-model="cardForm.billMode" placeholder="选择账单模式">
+                            <el-option label="固定宽限期" value="grace"></el-option>
+                            <el-option label="固定还款日" value="fixed"></el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <el-form-item 
+                        label="宽限期天数" 
+                        v-if="cardForm.billMode === 'grace'">
+                        <el-input-number 
+                            v-model="cardForm.gracePeriod" 
+                            :min="1" 
+                            :max="30"
+                            placeholder="输入宽限期天数">
+                        </el-input-number>
+                    </el-form-item>
+
+                    <el-form-item 
+                        label="固定还款日" 
+                        v-if="cardForm.billMode === 'fixed'">
+                        <el-input-number 
+                            v-model="cardForm.fixedRepaymentDay" 
+                            :min="1" 
+                            :max="31"
+                            placeholder="输入固定还款日">
                         </el-input-number>
                     </el-form-item>
 
@@ -48,6 +78,18 @@
                     <el-table-column prop="name" label="卡片名称"></el-table-column>
                     <el-table-column prop="bank" label="银行"></el-table-column>
                     <el-table-column prop="billDay" label="账单日"></el-table-column>
+                    <el-table-column prop="billMode" label="账单模式">
+                        <template #default="scope">
+                            {{ scope.row.billMode === 'grace' ? '固定宽限期' : '固定还款日' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="宽限期/还款日">
+                        <template #default="scope">
+                            {{ scope.row.gracePeriod || scope.row.fixedRepaymentDay }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="还款日" prop="repaymentDate"></el-table-column>
+                    <el-table-column label="免息天数" prop="interestFreeDays"></el-table-column>
                     <el-table-column label="操作">
                         <template #default="scope">
                             <el-button 

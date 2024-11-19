@@ -4,7 +4,6 @@ body {
     margin: 0;
     padding: 20px;
 }
-
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -13,48 +12,56 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
-
 h1 {
     text-align: center;
     color: #333;
     margin-bottom: 20px;
 }
-
 .el-form-item {
     margin-bottom: 15px;
 }
-
 .el-table {
     margin-top: 20px;
 }
-
 .el-button--primary {
     background-color: #409eff;
     border-color: #409eff;
 }
-
 .el-button--danger {
     background-color: #f56c6c;
     border-color: #f56c6c;
 }
-
 .el-input,
 .el-select,
 .el-input-number {
     width: 100%;
 }
-
+.el-button {
+    transition: all 0.3s ease;
+}
+.el-button:hover {
+    transform: translateY(-2px);
+}
+.el-table .el-table__row {
+    transition: background-color 0.3s ease;
+}
+/* 编辑对话框样式 */
+.edit-dialog .el-message-box__content {
+    min-width: 400px;
+}
+/* 表单验证样式 */
+.el-form-item.is-error .el-input__inner {
+    border-color: #f56c6c;
+}
 /* 响应式设计 */
 @media screen and (max-width: 600px) {
     .container {
         padding: 10px;
         width: 95%;
     }
-
     .el-form-item {
         flex-direction: column;
     }
-
     .el-form-item__label {
         text-align: left;
         margin-bottom: 5px;
